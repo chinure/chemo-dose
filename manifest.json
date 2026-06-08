@@ -1,0 +1,10 @@
+{
+  "name": "化疗药物剂量计算",
+  "short_name": "剂量计算",
+  "description": "体表面积 BSA 与卡铂 Calvert 公式剂量计算工具。",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#f2f8fd",
+  "theme_color": "#f2f8fd",
+  "lang": "zh-CN"
+}

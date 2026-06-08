@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="theme-color" content="#f2f8fd">
+    <meta name="description" content="体表面积 BSA 与卡铂 Calvert 公式剂量计算工具。">
+    <title>化疗药物剂量计算</title>
+    <link rel="manifest" href="./manifest.json">
+    <link rel="stylesheet" href="./styles.css">
+  </head>
+  <body>
+    <main class="page">
+      <section class="hero">
+        <div class="hero-main">
+          <div class="hero-kicker">Clinical Calculator</div>
+          <h1 class="title">化疗药物剂量计算</h1>
+          <div class="hero-meta">
+            <span>BSA</span>
+            <span>Calvert</span>
+            <span>剂量核算</span>
+          </div>
+        </div>
+        <div class="hero-mark" aria-hidden="true">Rx</div>
+      </section>
+
+      <nav class="tabs" aria-label="计算模式">
+        <button class="tab active" type="button" data-tab="bsa">
+          <span class="tab-title">体表面积</span>
+          <span class="tab-note">DuBois</span>
+        </button>
+        <button class="tab" type="button" data-tab="calvert">
+          <span class="tab-title">Calvert</span>
+          <span class="tab-note">卡铂</span>
+        </button>
+      </nav>
+
+      <section class="panel bsa-panel" data-panel="bsa">
+        <div class="panel-head">
+          <div>
+            <h2 class="section-title">DuBois 体表面积剂量</h2>
+            <div class="formula">BSA = W^0.425 x H^0.725 x 71.84 / 10000</div>
+          </div>
+          <span class="method-badge">mg/m2</span>
+        </div>
+
+        <label class="field">
+          <span class="label">体重</span>
+          <span class="input-row">
+            <input inputmode="decimal" id="bsa-weight" type="number" min="0" step="0.01" placeholder="请输入体重">
+            <span class="unit">kg</span>
+          </span>
+        </label>
+
+        <label class="field">
+          <span class="label">身高</span>
+          <span class="input-row">
+            <input inputmode="decimal" id="bsa-height" type="number" min="0" step="0.01" placeholder="请输入身高">
+            <span class="unit">cm</span>
+          </span>
+        </label>
+
+        <label class="field">
+          <span class="label">给药剂量</span>
+          <span class="input-row">
+            <input inputmode="decimal" id="bsa-dose" type="number" min="0" step="0.01" placeholder="请输入剂量">
+            <span class="unit">mg/m2</span>
+          </span>
+        </label>
+
+        <div class="actions bsa-actions">
+          <button class="primary" type="button" id="bsa-calc">计算</button>
+          <button class="ghost" type="button" id="bsa-reset">重置</button>
+        </div>
+
+        <div class="featured-result" aria-live="polite">
+          <span class="featured-label">药物总量</span>
+          <div class="featured-line">
+            <span class="featured-value" id="bsa-total">--</span>
+            <span class="featured-unit">mg</span>
+          </div>
+        </div>
+
+        <div class="result-grid">
+          <div class="result">
+            <span class="result-label">体表面积</span>
+            <span class="result-value" id="bsa-area">--</span>
+            <span class="result-unit">m2</span>
+          </div>
+          <div class="result">
+            <span class="result-label">单面积剂量</span>
+            <span class="result-value" id="bsa-dose-preview">--</span>
+            <span class="result-unit">mg/m2</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel calvert-panel hidden" data-panel="calvert">
+        <div class="panel-head">
+          <div>
+            <h2 class="section-title">卡铂 Calvert 剂量</h2>
+            <div class="formula">剂量 = AUC x (CrCl + 25)</div>
+          </div>
+          <span class="method-badge">AUC</span>
+        </div>
+
+        <div class="sex-row" role="radiogroup" aria-label="性别">
+          <button class="sex active" type="button" data-sex="male" aria-pressed="true">男</button>
+          <button class="sex" type="button" data-sex="female" aria-pressed="false">女</button>
+        </div>
+
+        <label class="field">
+          <span class="label">年龄</span>
+          <span class="input-row">
+            <input inputmode="numeric" id="calvert-age" type="number" min="0" step="1" placeholder="请输入年龄">
+            <span class="unit">岁</span>
+          </span>
+        </label>
+
+        <label class="field">
+          <span class="label">体重</span>
+          <span class="input-row">
+            <input inputmode="decimal" id="calvert-weight" type="number" min="0" step="0.01" placeholder="请输入体重">
+            <span class="unit">kg</span>
+          </span>
+        </label>
+
+        <label class="field">
+          <span class="label">血清肌酐</span>
+          <span class="input-row">
+            <input inputmode="decimal" id="calvert-scr" type="number" min="0" step="0.01" placeholder="请输入肌酐">
+            <span class="unit">umol/L</span>
+          </span>
+        </label>
+
+        <label class="field">
+          <span class="label">目标 AUC</span>
+          <span class="input-row">
+            <input inputmode="decimal" id="calvert-auc" type="number" min="0" step="0.01" placeholder="请输入 AUC">
+            <span class="unit">mg/ml/min</span>
+          </span>
+        </label>
+
+        <div class="actions">
+          <button class="primary" type="button" id="calvert-calc">计算</button>
+          <button class="ghost" type="button" id="calvert-example">示例</button>
+          <button class="ghost" type="button" id="calvert-reset">重置</button>
+        </div>
+
+        <div class="featured-result" aria-live="polite">
+          <span class="featured-label">药物总量</span>
+          <div class="featured-line">
+            <span class="featured-value" id="calvert-total">--</span>
+            <span class="featured-unit">mg</span>
+          </div>
+        </div>
+
+        <div class="result-grid">
+          <div class="result">
+            <span class="result-label">肌酐清除率</span>
+            <span class="result-value" id="calvert-crcl">--</span>
+            <span class="result-unit">ml/min</span>
+          </div>
+          <div class="result">
+            <span class="result-label">目标 AUC</span>
+            <span class="result-value" id="calvert-auc-preview">--</span>
+            <span class="result-unit">mg/ml/min</span>
+          </div>
+        </div>
+      </section>
+
+      <p class="notice">结果仅用于处方核对和教学演示，实际给药需结合医院规范、肾功能评估方式和医师判断。</p>
+    </main>
+
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+    <script src="./app.js"></script>
+  </body>
+</html>
