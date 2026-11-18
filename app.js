@@ -19,8 +19,7 @@
   }
 
   function round(value, digits) {
-    const factor = Math.pow(10, digits)
-    return String(Math.round(value * factor) / factor)
+    return String(Number(value.toFixed(digits)))
   }
 
   function requirePositive(values) {
@@ -62,6 +61,7 @@
   }
 
   function setSex(sex) {
+    const changed = state.sex !== sex
     state.sex = sex
 
     $all('.sex').forEach((button) => {
@@ -69,9 +69,23 @@
       button.classList.toggle('active', active)
       button.setAttribute('aria-pressed', String(active))
     })
+    if (changed) invalidateCalvert()
+  }
+
+  function invalidateBsa() {
+    setText('bsa-area', '--')
+    setText('bsa-total', '--')
+    setText('bsa-dose-preview', $('#bsa-dose').value || '--')
+  }
+
+  function invalidateCalvert() {
+    setText('calvert-crcl', '--')
+    setText('calvert-total', '--')
+    setText('calvert-auc-preview', $('#calvert-auc').value || '--')
   }
 
   function calculateBsa() {
+    invalidateBsa()
     const weight = $('#bsa-weight').value
     const height = $('#bsa-height').value
     const dosePerM2 = $('#bsa-dose').value
@@ -83,6 +97,10 @@
 
     const area = Math.pow(toNumber(weight), 0.425) * Math.pow(toNumber(height), 0.725) * 71.84 / 10000
     const totalDose = area * toNumber(dosePerM2)
+    if (!Number.isFinite(area) || !Number.isFinite(totalDose) || area <= 0 || totalDose <= 0) {
+      showToast('计算结果无效或超出范围，请核对输入')
+      return
+    }
 
     setText('bsa-area', round(area, 3))
     setText('bsa-total', round(totalDose, 1))
@@ -99,6 +117,7 @@
   }
 
   function calculateCalvert() {
+    invalidateCalvert()
     const age = $('#calvert-age').value
     const weight = $('#calvert-weight').value
     const scr = $('#calvert-scr').value
@@ -112,6 +131,10 @@
     const maleCrcl = (140 - toNumber(age)) * toNumber(weight) * 1.23 / toNumber(scr)
     const crcl = state.sex === 'female' ? maleCrcl * 0.85 : maleCrcl
     const totalDose = toNumber(auc) * (crcl + 25)
+    if (!Number.isFinite(crcl) || !Number.isFinite(totalDose) || crcl <= 0 || totalDose <= 0) {
+      showToast('计算结果无效或超出范围，请核对输入')
+      return
+    }
 
     setText('calvert-crcl', round(crcl, 1))
     setText('calvert-total', round(totalDose, 1))
@@ -155,12 +178,11 @@
     $('#calvert-example').addEventListener('click', fillCalvertExample)
     $('#calvert-reset').addEventListener('click', resetCalvert)
 
-    $('#bsa-dose').addEventListener('input', (event) => {
-      setText('bsa-dose-preview', event.target.value || '--')
+    ;['bsa-weight', 'bsa-height', 'bsa-dose'].forEach((id) => {
+      document.getElementById(id).addEventListener('input', invalidateBsa)
     })
-
-    $('#calvert-auc').addEventListener('input', (event) => {
-      setText('calvert-auc-preview', event.target.value || '--')
+    ;['calvert-age', 'calvert-weight', 'calvert-scr', 'calvert-auc'].forEach((id) => {
+      document.getElementById(id).addEventListener('input', invalidateCalvert)
     })
   }
 
